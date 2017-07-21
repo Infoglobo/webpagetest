@@ -14,6 +14,7 @@ A sample usage of this library can be found in wpt_batch.py.
 __author__ = 'zhaoq@google.com (Qi Zhao)'
 
 import re
+import logging
 import urllib
 from xml.dom import minidom
 

@@ -80,8 +80,13 @@ def RunBatch(options):
                  'fvonly': options.fvonly,
                  'runs': options.runs,
                  'location': options.location,
-                 'mv': options.mv
+                 'mv': options.mv,
+                 'mobile': options.mobile
                 }
+
+  if options.mobile:
+    options.connectivity = '3G'  
+  
   if options.connectivity == 'custom':
     test_params['bwOut'] = options.bwup
     test_params['bwIn'] = options.bwdown
@@ -170,7 +175,7 @@ def main():
                            help='the wpt server URL')
   option_parser.add_option('-i', '--urlfile', action='store',
                            default='', help='input URL file')
-  option_parser.add_option('-w', '--url', action='store',
+  option_parser.add_option('-I', '--url', action='store',
                            default='', help='URL to be tested')
   option_parser.add_option('-f', '--outputdir', action='store',
                            default='./result', help='output directory')
@@ -208,9 +213,11 @@ def main():
   option_parser.add_option('-r', '--runs', action='store', default=1,
                            help='the number of runs per test')
   option_parser.add_option('-o', '--location', action='store',
-                           default='Test', help='test location')
+                           default='ec2-sa-east-1', help='location to test from. For more details see (http://www.webpagetest.org/getLocations.php)')
   option_parser.add_option('-m', '--mv', action='store', default=1,
                            help='video only saved for the median run')
+  option_parser.add_option('-M', '--mobile', action='store', default=0,
+                           help='setup mobile test')
 
   options, args = option_parser.parse_args()
 
