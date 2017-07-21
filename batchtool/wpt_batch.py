@@ -98,7 +98,14 @@ def RunBatch(options):
   if options.key:
     test_params['k'] = options.key
 
-  requested_urls = wpt_batch_lib.ImportUrls(options.urlfile)
+  requested_urls = []
+
+  if options.urlfile:
+    requested_urls.extend(wpt_batch_lib.ImportUrls(options.urlfile))
+
+  if options.url:
+    requested_urls.append(options.url)
+
   id_url_dict = wpt_batch_lib.SubmitBatch(requested_urls, test_params,
                                           options.server)
 
@@ -159,22 +166,29 @@ def main():
 
   # Environment settings
   option_parser.add_option('-s', '--server', action='store',
-                           default='http://your_wpt_site/',
+                           default='http://www.webpagetest.org/',
                            help='the wpt server URL')
   option_parser.add_option('-i', '--urlfile', action='store',
-                           default='./urls.txt', help='input URL file')
+                           default='', help='input URL file')
+  option_parser.add_option('-w', '--url', action='store',
+                           default='', help='URL to be tested')
   option_parser.add_option('-f', '--outputdir', action='store',
                            default='./result', help='output directory')
 
+  # TODO: Adicionar parametro para definir se o teste sera mobile
+  # dependendo do valor definido para esse parametro devemos setar connectivity = 3G (Baixa qualidade)
+  # default=0
+
   # Test parameter settings
-  help_txt = 'set the connectivity to pre-defined type: '
-  help_txt += 'Cable, DSL, Dial, 3G, Fios and custom (case sensitive). '
-  help_txt += 'When it is custom, you can set the customized connectivity '
-  help_txt += 'using options -u/d/l/p.'
+  help_connectivity_txt = 'set the connectivity to pre-defined type: '
+  help_connectivity_txt += 'Cable, DSL, Dial, 3G, Fios and custom (case sensitive). '
+  help_connectivity_txt += 'When it is custom, you can set the customized connectivity '
+  help_connectivity_txt += 'using options -u/d/l/p.'
+
   option_parser.add_option('-k', '--key', action='store', default='',
                            help='API Key')
   option_parser.add_option('-y', '--connectivity', action='store',
-                           default='Cable', help=help_txt)
+                           default='Cable', help=help_connectivity_txt)
   option_parser.add_option('-u', '--bwup', action='store', default=384,
                            help='upload bandwidth of the test')
   option_parser.add_option('-d', '--bwdown', action='store', default=1500,
@@ -191,7 +205,7 @@ def main():
                            help='hosted script file')
   option_parser.add_option('-a', '--video', action='store', default=0,
                            help='capture video')
-  option_parser.add_option('-r', '--runs', action='store', default=9,
+  option_parser.add_option('-r', '--runs', action='store', default=1,
                            help='the number of runs per test')
   option_parser.add_option('-o', '--location', action='store',
                            default='Test', help='test location')
