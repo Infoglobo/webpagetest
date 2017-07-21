@@ -32,7 +32,6 @@ import time
 
 import wpt_batch_lib
 
-
 def BuildFileName(url):
   """Construct the file name from a given URL.
 
@@ -103,15 +102,18 @@ def RunBatch(options):
   if options.key:
     test_params['k'] = options.key
 
-  requested_urls = []
+  # create directory to store test id if it does not exists  
+  if not os.path.isdir(options.testidsdir):
+    os.mkdir(options.testidsdir)
 
+  # defining urls to be tested 
+  requested_urls = []
   if options.urlfile:
     requested_urls.extend(wpt_batch_lib.ImportUrls(options.urlfile))
-
   if options.url:
     requested_urls.append(options.url)
 
-  id_url_dict = wpt_batch_lib.SubmitBatch(requested_urls, test_params,
+  id_url_dict = wpt_batch_lib.SubmitBatch(requested_urls, test_params, options.testidsdir, 
                                           options.server)
 
   submitted_urls = set(id_url_dict.values())
@@ -179,10 +181,8 @@ def main():
                            default='', help='URL to be tested')
   option_parser.add_option('-f', '--outputdir', action='store',
                            default='./result', help='output directory')
-
-  # TODO: Adicionar parametro para definir se o teste sera mobile
-  # dependendo do valor definido para esse parametro devemos setar connectivity = 3G (Baixa qualidade)
-  # default=0
+  option_parser.add_option('-T', '--testidsdir', action='store',
+                           default='./test_ids', help='test ids directory')
 
   # Test parameter settings
   help_connectivity_txt = 'set the connectivity to pre-defined type: '

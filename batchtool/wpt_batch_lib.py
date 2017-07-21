@@ -16,8 +16,12 @@ __author__ = 'zhaoq@google.com (Qi Zhao)'
 import re
 import logging
 import urllib
+import os
 from xml.dom import minidom
 
+def CreateFile(dir, filename):
+  file = open(os.path.join(dir, filename), "w")
+  file.close() 
 
 def __LoadEntity(url, urlopen=urllib.urlopen):
   """A helper function to load an entity such as an URL.
@@ -51,7 +55,7 @@ def ImportUrls(url_filename):
   return url_list
 
 
-def SubmitBatch(url_list, test_params, server_url='http://www.webpagetest.org/',
+def SubmitBatch(url_list, test_params, testidsdir, server_url='http://www.webpagetest.org/',
                 urlopen=urllib.urlopen):
   """Submit the tests to WebPageTest server.
 
@@ -78,6 +82,11 @@ def SubmitBatch(url_list, test_params, server_url='http://www.webpagetest.org/',
       if status == '200':
         test_id = dom.getElementsByTagName('testId')[0].firstChild.wholeText
         id_url_dict[test_id] = url
+        CreateFile(testidsdir, test_id)
+      else:
+        nodes = dom.getElementsByTagName('statusText')
+        error_message = nodes[0].firstChild.wholeText
+        logging.error('Request status[%s]: %s', status, error_message)
   return id_url_dict
 
 
