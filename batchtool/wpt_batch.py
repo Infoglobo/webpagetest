@@ -80,7 +80,7 @@ def RunBatch(options):
                  'runs': options.runs,
                  'location': options.location,
                  'mv': options.mv,
-                 'mobile': options.mobile
+                 'mobile': (1 if options.mobile else 0)
                 }
 
   if options.mobile:
@@ -116,10 +116,14 @@ def RunBatch(options):
   id_url_dict = wpt_batch_lib.SubmitBatch(requested_urls, test_params, options.testidsdir, 
                                           options.server)
 
-  submitted_urls = set(id_url_dict.values())
-  for url in requested_urls:
-    if url not in submitted_urls:
-      logging.warn('URL submission failed: %s', url)
+
+  #TODO: Se o dictionary id_url_dict estiver vazio, sair da aplicação com um erro exit 1.
+
+
+  #submitted_urls = set(id_url_dict.values())
+  #for url in requested_urls:
+  #  if url not in submitted_urls:
+  #    logging.warn('URL submission failed: %s', url)
 
   pending_test_ids = id_url_dict.keys()
   if not os.path.isdir(options.outputdir):
@@ -177,7 +181,7 @@ def main():
                            help='the wpt server URL')
   option_parser.add_option('-i', '--urlfile', action='store',
                            default='', help='input URL file')
-  option_parser.add_option('-I', '--url', action='store',
+  option_parser.add_option('-U', '--url', action='store',
                            default='', help='URL to be tested')
   option_parser.add_option('-f', '--outputdir', action='store',
                            default='./result', help='output directory')
@@ -216,7 +220,7 @@ def main():
                            default='ec2-sa-east-1', help='location to test from. For more details see (http://www.webpagetest.org/getLocations.php)')
   option_parser.add_option('-m', '--mv', action='store', default=1,
                            help='video only saved for the median run')
-  option_parser.add_option('-M', '--mobile', action='store', default=0,
+  option_parser.add_option('-M', '--mobile', action='store_true', default=False,
                            help='setup mobile test')
 
   options, args = option_parser.parse_args()

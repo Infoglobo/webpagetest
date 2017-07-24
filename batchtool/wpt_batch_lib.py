@@ -86,7 +86,7 @@ def SubmitBatch(url_list, test_params, testidsdir, server_url='http://www.webpag
       else:
         nodes = dom.getElementsByTagName('statusText')
         error_message = nodes[0].firstChild.wholeText
-        logging.error('Request status[%s]: %s', status, error_message)
+        logging.error('url[%s] status[%s] message[%s]', request, status, error_message)
   return id_url_dict
 
 

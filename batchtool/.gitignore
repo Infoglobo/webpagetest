@@ -1,0 +1,4 @@
+result/
+test_ids/
+
+*.pyc
