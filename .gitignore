@@ -1,5 +1,7 @@
 .vscode/
-
+result/
+test_ids/
+    
 Debug/
 PageSpeed/lib/Debug/
 Release/

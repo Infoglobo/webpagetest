@@ -19,8 +19,9 @@ import urllib
 import os
 from xml.dom import minidom
 
-def CreateFile(dir, filename):
-  file = open(os.path.join(dir, filename), "w")
+def CreateFile(filepath, content=''):
+  file = open(filepath, "w")
+  file.write(content)
   file.close() 
 
 def __LoadEntity(url, urlopen=urllib.urlopen):
@@ -54,6 +55,10 @@ def ImportUrls(url_filename):
       url_list.append(url)
   return url_list
 
+def GetXmlNodeValue(xml, node_name):
+    dom = minidom.parseString(xml)
+    nodes = dom.getElementsByTagName(node_name)
+    return nodes[0].firstChild.wholeText
 
 def SubmitBatch(url_list, test_params, testidsdir, server_url='http://www.webpagetest.org/',
                 urlopen=urllib.urlopen):
@@ -76,22 +81,31 @@ def SubmitBatch(url_list, test_params, testidsdir, server_url='http://www.webpag
     response = __LoadEntity(request, urlopen)
     return_code = response.getcode()
     if return_code == 200:
-      dom = minidom.parseString(response.read())
-      nodes = dom.getElementsByTagName('statusCode')
-      status = nodes[0].firstChild.wholeText
+      response_xml = response.read()
+      status = GetXmlNodeValue(response_xml, 'statusCode')
       if status == '200':
-        test_id = dom.getElementsByTagName('testId')[0].firstChild.wholeText
+        test_id = GetXmlNodeValue(response_xml, 'testId')
         id_url_dict[test_id] = url
-        CreateFile(testidsdir, test_id)
+        CreateFile(os.path.join(testidsdir, test_id), server_url)
       else:
-        nodes = dom.getElementsByTagName('statusText')
-        error_message = nodes[0].firstChild.wholeText
+        error_message = GetXmlNodeValue(response_xml, 'statusText')
         logging.error('url[%s] status[%s] message[%s]', request, status, error_message)
   return id_url_dict
 
+def CheckStatus(test_id, server_url, urlopen=urllib.urlopen):
+  wpt_url = server_url + 'testStatus.php?f=xml&test=' + test_id
+  response = __LoadEntity(wpt_url, urlopen)
+  response_xml = response.read()
+  if response.getcode() == 200:
+      status_code = GetXmlNodeValue(response_xml, 'statusCode')
+      return status_code
+  else: 
+      error_message = GetXmlNodeValue(response_xml, 'statusText')
+      logging.error('CheckStatus failed: url[%s] status[%s] message[%s]', wpt_url, status, error_message)
+      return None
+  
 
-def CheckBatchStatus(test_ids, server_url='http://www.webpagetest.org/',
-                     urlopen=urllib.urlopen):
+def CheckBatchStatus(test_ids, server_url='http://www.webpagetest.org/', urlopen=urllib.urlopen):
   """Check the status of tests.
 
   Args:
@@ -104,18 +118,20 @@ def CheckBatchStatus(test_ids, server_url='http://www.webpagetest.org/',
   """
   id_status_dict = {}
   for test_id in test_ids:
-    request = server_url + 'testStatus.php?f=xml&test=' + test_id
-    response = __LoadEntity(request, urlopen)
-    if response.getcode() == 200:
-      dom = minidom.parseString(response.read())
-      nodes = dom.getElementsByTagName('statusCode')
-      status_code = nodes[0].firstChild.wholeText
+    status_code = CheckStatus(test_id, urlopen)
+    if status_code:
       id_status_dict[test_id] = status_code
+    
   return id_status_dict
 
+def GetJSONResult(test_id, server_url='http://www.webpagetest.org/', urlopen=urllib.urlopen):
+  wpt_url = server_url + 'jsonResult.php?test=' + test_id
+  response = __LoadEntity(wpt_url, urlopen)
+  if response.getcode() == 200:
+    return response.read()
+  return None
 
-def GetXMLResult(test_ids, server_url='http://www.webpagetest.org/',
-                 urlopen=urllib.urlopen):
+def GetXMLResult(test_ids, server_url='http://www.webpagetest.org/', urlopen=urllib.urlopen):
   """Obtain the test result in XML format.
 
   Args:

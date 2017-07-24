@@ -116,51 +116,8 @@ def RunBatch(options):
   id_url_dict = wpt_batch_lib.SubmitBatch(requested_urls, test_params, options.testidsdir, 
                                           options.server)
 
-
-  #TODO: Se o dictionary id_url_dict estiver vazio, sair da aplicação com um erro exit 1.
-
-
-  #submitted_urls = set(id_url_dict.values())
-  #for url in requested_urls:
-  #  if url not in submitted_urls:
-  #    logging.warn('URL submission failed: %s', url)
-
-  pending_test_ids = id_url_dict.keys()
-  if not os.path.isdir(options.outputdir):
-    os.mkdir(options.outputdir)
-  while pending_test_ids:
-    # TODO(zhaoq): add an expiring mechanism so that if some tests are stuck
-    # too long they will reported as permanent errors and while loop will be
-    # terminated.
-
-    id_status_dict = wpt_batch_lib.CheckBatchStatus(pending_test_ids,
-                                                    server_url=options.server)
-    completed_test_ids = []
-    for test_id, test_status in id_status_dict.iteritems():
-      # We could get 4 different status codes with different meanings as
-      # as follows:
-      # 1XX: Test in progress
-      # 200: Test complete
-      # 4XX: Test request not found
-      if int(test_status) >= 200:
-        pending_test_ids.remove(test_id)
-        if test_status == '200':
-          completed_test_ids.append(test_id)
-        else:
-          logging.warn('Tests failed with status $s: %s', test_status, test_id)
-    test_results = wpt_batch_lib.GetXMLResult(completed_test_ids,
-                                              server_url=options.server)
-    result_test_ids = set(test_results.keys())
-    for test_id in completed_test_ids:
-      if test_id not in result_test_ids:
-        logging.warn('The XML failed to retrieve: %s', test_id)
-
-    for test_id, dom in test_results.iteritems():
-      SaveTestResult(options.outputdir, id_url_dict[test_id], test_id,
-                     dom.toxml('utf-8'))
-    if pending_test_ids:
-      time.sleep(int(options.runs) * 10)
-
+  if len(id_url_dict) == 0:
+    exit(1)
 
 def main():
   class PlainHelpFormatter(optparse.IndentedHelpFormatter):
@@ -229,3 +186,4 @@ def main():
 
 if __name__ == '__main__':
   main()
+  exit(0)
