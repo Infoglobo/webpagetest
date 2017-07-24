@@ -37,13 +37,10 @@ def main():
     parser = argparse.ArgumentParser(description='')
 
     # Environment settings
-    parser.add_argument('-f', '--outputdir', action='store',
-                           default='./result', help='output directory')
-    parser.add_argument('-T', '--testidsdir', action='store',
-                           default='./test_ids', help='test ids directory')
+    parser.add_argument('-f', '--outputdir', action='store', default='./result', help='output directory')
+    parser.add_argument('-T', '--testidsdir', action='store', default='./test_ids', help='test ids directory')
 
     run_monitor(parser.parse_args())
-
 
 if __name__ == '__main__':
   main()
