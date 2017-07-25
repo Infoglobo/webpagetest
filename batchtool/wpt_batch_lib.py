@@ -17,6 +17,7 @@ import re
 import logging
 import urllib
 import os
+import sys
 from xml.dom import minidom
 
 def CreateFile(filepath, content=''):
@@ -124,30 +125,16 @@ def CheckBatchStatus(test_ids, server_url='http://www.webpagetest.org/', urlopen
     
   return id_status_dict
 
-def GetJSONResult(test_id, server_url='http://www.webpagetest.org/', urlopen=urllib.urlopen):
-  wpt_url = server_url + 'jsonResult.php?test=' + test_id
-  response = __LoadEntity(wpt_url, urlopen)
-  if response.getcode() == 200:
-    return response.read()
-  return None
+def GetResult(test_id, outputformat, server_url='http://www.webpagetest.org/', urlopen=urllib.urlopen):
+    wpt_url = ''
+    if outputformat == 'json':
+        wpt_url = server_url + 'jsonResult.php?test=' + test_id
+    elif outputformat == 'xml':
+        wpt_url = server_url + 'xmlResult/' + test_id + '/'
+    else:
+        sys.exit('Invalid output format')
 
-def GetXMLResult(test_ids, server_url='http://www.webpagetest.org/', urlopen=urllib.urlopen):
-  """Obtain the test result in XML format.
-
-  Args:
-    test_ids: the list of interested test ids
-    server_url: the URL of WebPageTest server
-    urlopen: the callable to be used to load the request
-
-  Returns:
-    A dictionary where the key is test id and the value is a DOM object of the
-    test result.
-  """
-  id_dom_dict = {}
-  for test_id in test_ids:
-    request = server_url + 'xmlResult/' + test_id + '/'
-    response = __LoadEntity(request, urlopen)
+    response = __LoadEntity(wpt_url, urlopen)
     if response.getcode() == 200:
-      dom = minidom.parseString(response.read())
-      id_dom_dict[test_id] = dom
-  return id_dom_dict
+        return response.read()
+    return None

@@ -140,8 +140,6 @@ def main():
                            default='', help='input URL file')
   option_parser.add_option('-U', '--url', action='store',
                            default='', help='URL to be tested')
-  option_parser.add_option('-f', '--outputdir', action='store',
-                           default='./result', help='output directory')
   option_parser.add_option('-T', '--testidsdir', action='store',
                            default='./test_ids', help='test ids directory')
 

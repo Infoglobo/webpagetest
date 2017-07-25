@@ -26,8 +26,8 @@ def run_monitor(options):
            if int(test_status) >= 200:
                os.remove(file_path)
                if test_status == '200':
-                   json_result = wpt_batch_lib.GetJSONResult(test_id, server_url)
-                   wpt_batch_lib.CreateFile(os.path.join(options.outputdir, test_id + '.json'), json_result)
+                   result = wpt_batch_lib.GetResult(test_id, options.outputformat, server_url)
+                   wpt_batch_lib.CreateFile(os.path.join(options.outputdir, test_id + '.' + options.outputformat.lower()), result)
                else:
                    logging.error('Test failed: test_id[%s] test_status[%s]', test_id, test_status)    
 
@@ -39,6 +39,9 @@ def main():
     # Environment settings
     parser.add_argument('-f', '--outputdir', action='store', default='./result', help='output directory')
     parser.add_argument('-T', '--testidsdir', action='store', default='./test_ids', help='test ids directory')
+
+    # Result settings
+    parser.add_argument('-F', '--outputformat', action='store', default='xml', help='used to set the response format sent by the WPT Server', choices=['json', 'xml'] )
 
     run_monitor(parser.parse_args())
 
