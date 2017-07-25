@@ -4,19 +4,19 @@ This is an unofficial fork based in official WebPagetest repository [WebPagetest
 
 Refer to the [original documentation](https://sites.google.com/a/webpagetest.org/docs/advanced-features/webpagetest-batch-processing-command-line-tool) to run the script properly.
 
-<h1>Motivations</h1>
+<h1>Motivation</h1>
 
-The original code had some drawbacks - it waits all the urls being tested to end before you can run it again and the .txt file is the only input available to insert new urls.
+The original code waits in a loop until all the tests submitted are finished. That could result in an infinite loop if any of the tests never completes.
 
-With these points in mind, we made some modfications in the original code to solve them.
+We also wanted to add more command line options and have the test results saved in json format.
 
-<h1>New Features</h1>
+<h1>New Behaviour</h1>
 
-We separated the wpt_batch's responsabilities in two:
+We splitted the original wp_batch.py in two scripts with different responsibilities:
 
 <h2>wpt_batch</h2>
 
-Send the url to WebPagetest's API, receive the **test id** related to the url and save it as a filename in **test_ids_dir** directory.
+Sends a set of urls to a webpagetest server, receives the **test id** associated with each url and saves them as files in  a **test_ids_dir** directory (option --testidsdir), each file is named with the testid received and the URL of webpagetest server used is saved as content of each testid file.
 
 <h2>wpt_batch_monitor</h2>
 
@@ -25,32 +25,45 @@ Listen **test_ids_dir** directory and for each file inside it will request WebPa
 * 2XX - generate a .json file inside **result** directory and remove the file from **test_id_dir**
 * 4XX - as it is an error, only remove the file from **test_id_dir**
 
-To allow this behaviour, some modifications had been made, adding new command line options:
+<h1>New command line options</h1>
 
-<h2>Provide one single URL instead of a .txt file (-U, --url)</h2>
+<h2>wpt_batch</h2>
 
-It's an alternative to **--urlfile** option, it will only add new urls to be tested.
+<h3> -T|--testidsdir <DIRECTORY>: path to a directory where the testid files are stored. If omitted, defaults to "./testid".</h3> 
+
+<h3> -f|--outputdir <DIRECTORY>: path to a directory... (TODO: remove this option from wpt_batch.py!!) </h3>
+
+<h3> -U|--url <URL_TO_BE_TESTED>: Sets an URL to be tested</h3>
+
+This option is an alternative to **--urlfile**. Both can be used simultaneously, in that case all URLs from the file and from the command line are be submitted together.
 
 <pre>
 <code>$ python wpt_batch.py -U http://your-url.com</code>
 <code>$ python wpt_batch.py --url http://your-url.com</code>
 </pre>
 
-<h2>Set the test to run in an mobile environment (-M, --mobile)</h2>
-Build a profile to simulate an mobile 3G connection.
+<h3>-M|--mobile: Enables the "mobile" test parameter. From webpagetest documentation, what is does is "Set to 1 to have Chrome emulate a mobile browser (screen resolution, UA string, fixed viewport)". See: https://sites.google.com/a/webpagetest.org/docs/advanced-features/webpagetest-restful-apis  </h3>
+
 <pre>
-<code>$ python wpt_batch.py -U http://your-url.com -M</code>
-<code>$ python wpt_batch.py --url http://your-url.com --mobile</code>
+<code>$ python wpt_batch.py --mobile --url http://your-url.com  </code>
 </pre>
+
+<h2>wpt_batch_monitor</h2>
+
+<h3> -T|--testidsdir <DIRECTORY>: path to the directory where wp_batch stores the testid files.  If omitted, defaults to "./testid".</h3> 
+
+wpt_batch_monitor stays in a loop waiting for new files to appear. Whenever it sees a new testid file, it will request the webpagetest server to get the test result. The URL of the webpagetest server is extracted from the testid file. If a given test completes, the testid file is removed from the 'testidsdir' and the result is saved as a json file in '--outputdir'
+
+<h3> -f|--outputdir <DIRECTORY>: path to a directory to save the results of the tests completed succesfully. If omitted, defaults to "./result" </h3>
 
 <h1>Usage</h1>
 
 This is a basic example on how to setup properly the script to run. You can freely adapt it to suit your needs.
 
-1. Run the monitor script to monitor all urls sent to be tested
+1. Run the monitor script in background to monitor all urls sent to be tested
 
 <pre>
-<code>$ python wpt_batch_monitor.py</code>
+<code>$ python wpt_batch_monitor.py --testidsdir ./test_ids --outputdir ./result &</code>
 </pre>
 
 2. Using **crontab**, add lines to call the script, passing the -U arg to inform which url will be tested. Here we will put 3 different urls to be tested, every day, at 2am
