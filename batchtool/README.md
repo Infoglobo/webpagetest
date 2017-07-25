@@ -8,13 +8,15 @@ The original code had some drawbacks - it waits all the urls being tested to end
 
 With these points in mind, we made some modfications in the original code to solve them.
 
+<h1>New Features</h1>
+
 We separated the wpt_batch's responsabilities in two:
 
-## wpt_batch
+<h2>wpt_batch</h2>
 
 Send the url to WebPagetest's API, receive the **test id** related to the url and save it as a filename in **test_ids_dir** directory.
 
-## wpt_batch_monitor
+<h2>wpt_batch_monitor</h2>
 
 Listen **test_ids_dir** directory and for each file inside it will request WebPagetest's API to see the status code:
 * 1XX - do nothing, will consult it again in next turn
@@ -37,3 +39,20 @@ Build a profile to simulate an mobile 3G connection.
 <code>$ python wpt_batch.py --url http://your-url.com --mobile</code>
 </pre>
 
+<h1>Usage</h1>
+
+This is a basic example on how to setup properly the script to run. You can freely adapt it to suit your needs.
+
+1. Run the monitor script to listen all urls sent to be tested
+
+<pre>
+<code>$ python wpt_batch_monitor.py</code>
+</pre>
+
+2. Using **crontab**, add a new line informing script to run at 2am daily, testing an url
+
+<pre>
+<code>0 2 * * * /usr/bin/python wpt_batch.py -U http://your-url-1.com</code>
+<code>0 2 * * * /usr/bin/python wpt_batch.py -U http://your-url-2.com</code>
+<code>0 2 * * * /usr/bin/python wpt_batch.py -U http://your-url-3.com</code>
+</pre>
