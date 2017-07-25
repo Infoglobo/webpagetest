@@ -26,13 +26,15 @@ Listen **test_ids_dir** directory and for each file inside it will request WebPa
 To allow this behaviour, some modifications had been made, adding new command line options:
 
 <h2>Provide one single URL instead of a .txt file (-U, --url)</h2>
+
 It's an alternative to **--urlfile** option, it will only add new urls to be tested.
+
 <pre>
 <code>$ python wpt_batch.py -U http://your-url.com</code>
 <code>$ python wpt_batch.py --url http://your-url.com</code>
 </pre>
 
-<h2>Set the test to run in an mobile environment</h2>
+<h2>Set the test to run in an mobile environment (-M, --mobile)</h2>
 Build a profile to simulate an mobile 3G connection.
 <pre>
 <code>$ python wpt_batch.py -U http://your-url.com -M</code>
@@ -43,13 +45,13 @@ Build a profile to simulate an mobile 3G connection.
 
 This is a basic example on how to setup properly the script to run. You can freely adapt it to suit your needs.
 
-1. Run the monitor script to listen all urls sent to be tested
+1. Run the monitor script to monitor all urls sent to be tested
 
 <pre>
 <code>$ python wpt_batch_monitor.py</code>
 </pre>
 
-2. Using **crontab**, add a new line informing script to run at 2am daily, testing an url
+2. Using **crontab**, add lines to call the script, passing the -U arg to inform which url will be tested. Here we will put 3 different urls to be tested, every day, at 2am
 
 <pre>
 <code>0 2 * * * /usr/bin/python wpt_batch.py -U http://your-url-1.com</code>
