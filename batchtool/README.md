@@ -1,8 +1,10 @@
+<h1>BatchTool</h1>
+
 This is an unofficial fork based in official WebPagetest repository [WebPagetest](https://github.com/WPO-Foundation/webpagetest).
 
 Refer to the [original documentation](https://sites.google.com/a/webpagetest.org/docs/advanced-features/webpagetest-batch-processing-command-line-tool) to run the script properly.
 
-<h1>BatchTool</h1>
+<h1>Motivations</h1>
 
 The original code had some drawbacks - it waits all the urls being tested to end before you can run it again and the .txt file is the only input available to insert new urls.
 
