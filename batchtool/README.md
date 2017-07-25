@@ -29,20 +29,28 @@ Listen **test_ids_dir** directory and for each file inside it will request WebPa
 
 <h2>wpt_batch</h2>
 
-<h3> -T|--testidsdir <DIRECTORY>: path to a directory where the testid files are stored. If omitted, defaults to "./testid".</h3> 
+* <h3>-f | --outputdir [DIRECTORY]</h3>
 
-<h3> -f|--outputdir <DIRECTORY>: path to a directory... (TODO: remove this option from wpt_batch.py!!) </h3>
+Path to a directory... (TODO: remove this option from wpt_batch.py)
 
-<h3> -U|--url <URL_TO_BE_TESTED>: Sets an URL to be tested</h3>
+* <h3>-T | --testidsdir [DIRECTORY]</h3>
 
-This option is an alternative to **--urlfile**. Both can be used simultaneously, in that case all URLs from the file and from the command line are be submitted together.
+Path to a directory where the testid files are stored. If omitted, defaults to "./testid". 
+
+* <h3>-U | --url [URL_TO_BE_TESTED]</h3>
+
+Sets an URL to be tested
+
+This option is an alternative to **--urlfile**. Both can be used simultaneously, in that case all URLs from the file and from the command line are submitted together.
 
 <pre>
 <code>$ python wpt_batch.py -U http://your-url.com</code>
 <code>$ python wpt_batch.py --url http://your-url.com</code>
 </pre>
 
-<h3>-M|--mobile: Enables the "mobile" test parameter. From webpagetest documentation, what is does is "Set to 1 to have Chrome emulate a mobile browser (screen resolution, UA string, fixed viewport)". See: https://sites.google.com/a/webpagetest.org/docs/advanced-features/webpagetest-restful-apis  </h3>
+* <h3>-M | --mobile</h3> 
+
+Enables the "mobile" test parameter. From webpagetest documentation, what is does is "Set to 1 to have Chrome emulate a mobile browser (screen resolution, UA string, fixed viewport)". See the [documentation](https://sites.google.com/a/webpagetest.org/docs/advanced-features/webpagetest-restful-apis)
 
 <pre>
 <code>$ python wpt_batch.py --mobile --url http://your-url.com  </code>
@@ -50,11 +58,18 @@ This option is an alternative to **--urlfile**. Both can be used simultaneously,
 
 <h2>wpt_batch_monitor</h2>
 
-<h3> -T|--testidsdir <DIRECTORY>: path to the directory where wp_batch stores the testid files.  If omitted, defaults to "./testid".</h3> 
+* <h3>-T | --testidsdir [DIRECTORY]</h3>
 
-wpt_batch_monitor stays in a loop waiting for new files to appear. Whenever it sees a new testid file, it will request the webpagetest server to get the test result. The URL of the webpagetest server is extracted from the testid file. If a given test completes, the testid file is removed from the 'testidsdir' and the result is saved as a json file in '--outputdir'
+Path to the directory where wp_batch stores the testid files. The default value is **./testid**.
 
-<h3> -f|--outputdir <DIRECTORY>: path to a directory to save the results of the tests completed succesfully. If omitted, defaults to "./result" </h3>
+The script wpt_batch_monitor stays in a loop waiting for new files to appear. Whenever it sees a new **test_id** file, it will request the WePpagetest server to get the test result. 
+
+The URL of the WePpagetest server is extracted from the **test_id** file. 
+
+If a given test completes, the **test_id** file is removed from the **test_ids_dir** and the result is saved as a json file in **--outputdir**
+
+* <h3>-f | --outputdir [DIRECTORY]</h3>
+Path to a directory to save the results of the tests completed succesfully. If omitted, defaults to **./result**
 
 <h1>Usage</h1>
 
